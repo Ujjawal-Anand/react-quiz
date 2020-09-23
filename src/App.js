@@ -18,7 +18,8 @@ class App extends Component {
       answerOptions: [],
       answer: '',
       answersCount: {},
-      result: ''
+      score: 0,
+      result: false
     }
   }
 
@@ -28,7 +29,7 @@ class App extends Component {
   */
   componentDidMount() {
     const shuffleAnswerOptions = 
-        quizQuestions.map((question) => this.shuffleArray(question.answers));
+        quizQuestions.map((question) => this.shuffleArray(question.options));
 
     this.setState({
       question: quizQuestions[0].question,
@@ -60,17 +61,22 @@ class App extends Component {
     if(this.state.questionId < quizQuestions.length) {
       setTimeout(() => this.setNextQuestion(), 300);
     } else {
-      setTimeout(() => this.setResults(this.getResults()), 300);
+      this.setState({
+        result: true
+      });
     }
   }
 
   setUserAnser = (userAnswer) => {
+    const score = (userAnswer === quizQuestions[this.state.counter].rightAnswer) ? 1 : -1
+
     this.setState((state) => ({
       answersCount: {
         ...state.answersCount,
-        [userAnswer]: (state.answersCount[userAnswer] || 0) + 1
+        [this.state.counter]: userAnswer
       },
-      answer: userAnswer
+      answer: userAnswer,
+      score: state.score + score
     }));
   }
 
@@ -81,33 +87,16 @@ class App extends Component {
       counter: counter,
       questionId: questionId,
       question: quizQuestions[counter].question,
-      answerOptions: quizQuestions[counter].answers,
+      answerOptions: quizQuestions[counter].options,
       answer: ''
     })
-  }
-
-  getResults = () => {
-    const answersCount = this.state.answersCount;
-    const answersCountKeys = Object.keys(answersCount);
-    const answersCountValues = answersCountKeys.map((key) => answersCount[key]);
-    const maxAnswerCount = Math.max.apply(null, answersCountValues);
-
-    return answersCountKeys.filter((key) => answersCount[key] === maxAnswerCount);
-
-  }
-
-  setResults = (result) => {
-    if (result.length === 1) {
-      this.setState({ result: result[0]});
-    } else {
-      this.setState({ result: 'Undeterminded'});
-    }
   }
 
   renderQuiz = () => {
     return (
       <Quiz
           answer={this.state.answer}
+          counter={this.state.counter}
           answerOptions={this.state.answerOptions}
           questionId={this.state.questionId}
           question={this.state.question}
@@ -119,7 +108,7 @@ class App extends Component {
 
   renderResult = () => {
     return (
-      <Result quizResult={this.state.result} />
+      <Result score={this.state.score} />
     );
   }
 

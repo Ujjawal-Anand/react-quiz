@@ -9,19 +9,19 @@ function Result(props) {
             component="div"
             transitionName="fade"
             transitionEnterTimeout={800}
-            transtionLeaveTimeout={500}
+            transitionLeaveTimeout={500}
             transitionAppear
             transitionAppearTimeout={500}
         >
             <div className="result">
-                You prefer <strong>{props.quizResult}</strong>
+                You score is <strong>{props.score}</strong>
             </div>
         </CSSTransitionGroup>
     );
 }
 
 Result.propTypes = {
-    quizResult: PropTypes.string.isRequired
+    score: PropTypes.number.isRequired
 };
 
 export default Result;
